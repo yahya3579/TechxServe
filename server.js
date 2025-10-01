@@ -60,6 +60,8 @@ const upload = multer({
 
 // Serve static files from public directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/blogs', express.static(path.join(__dirname, 'public/blogs')));
 
 // Image upload endpoint
 app.post('/api/upload/image', upload.single('image'), (req, res) => {
@@ -72,7 +74,7 @@ app.post('/api/upload/image', upload.single('image'), (req, res) => {
     }
 
     // Return the file path relative to public directory
-    const imageUrl = `/public/blogs/${req.file.filename}`;
+    const imageUrl = `/blogs/${req.file.filename}`;
     
     res.json({
       success: true,
