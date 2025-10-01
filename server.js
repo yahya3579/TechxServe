@@ -58,10 +58,46 @@ const upload = multer({
   }
 });
 
-// Serve static files from public directory
-app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
-app.use('/blogs', express.static(path.join(__dirname, 'public/blogs')));
+// Serve static files from public directory with proper headers
+app.use('/public', (req, res, next) => {
+  // Set proper content-type for images
+  if (req.url.match(/\.(jpg|jpeg)$/i)) {
+    res.type('image/jpeg');
+  } else if (req.url.match(/\.png$/i)) {
+    res.type('image/png');
+  } else if (req.url.match(/\.gif$/i)) {
+    res.type('image/gif');
+  } else if (req.url.match(/\.webp$/i)) {
+    res.type('image/webp');
+  }
+  express.static(path.join(__dirname, 'public'))(req, res, next);
+});
+
+app.use('/images', (req, res, next) => {
+  if (req.url.match(/\.(jpg|jpeg)$/i)) {
+    res.type('image/jpeg');
+  } else if (req.url.match(/\.png$/i)) {
+    res.type('image/png');
+  } else if (req.url.match(/\.gif$/i)) {
+    res.type('image/gif');
+  } else if (req.url.match(/\.webp$/i)) {
+    res.type('image/webp');
+  }
+  express.static(path.join(__dirname, 'public/images'))(req, res, next);
+});
+
+app.use('/blogs', (req, res, next) => {
+  if (req.url.match(/\.(jpg|jpeg)$/i)) {
+    res.type('image/jpeg');
+  } else if (req.url.match(/\.png$/i)) {
+    res.type('image/png');
+  } else if (req.url.match(/\.gif$/i)) {
+    res.type('image/gif');
+  } else if (req.url.match(/\.webp$/i)) {
+    res.type('image/webp');
+  }
+  express.static(path.join(__dirname, 'public/blogs'))(req, res, next);
+});
 
 // Image upload endpoint
 app.post('/api/upload/image', upload.single('image'), (req, res) => {
@@ -691,6 +727,32 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Contact API is running' });
+});
+
+// Test image serving endpoint
+app.get('/api/test-image', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const blogsDir = path.join(__dirname, 'public', 'blogs');
+  
+  if (!fs.existsSync(blogsDir)) {
+    return res.status(404).json({ error: 'Blogs directory not found' });
+  }
+  
+  const files = fs.readdirSync(blogsDir);
+  const imageFiles = files.filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file));
+  
+  res.json({
+    blogsDirectory: blogsDir,
+    totalFiles: files.length,
+    imageFiles: imageFiles.length,
+    sampleImages: imageFiles.slice(0, 5).map(file => ({
+      filename: file,
+      url: `https://techxserve.co/blogs/${file}`,
+      legacyUrl: `https://techxserve.co/public/blogs/${file}`
+    }))
+  });
 });
 
 // Newsletter unsubscribe endpoint
