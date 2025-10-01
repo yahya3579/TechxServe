@@ -565,4 +565,45 @@ Submitted on: ${new Date().toLocaleString()}
   }
 };
 
+// Send blog notification email to newsletter subscribers
+const sendBlogNotificationEmail = async ({ emails, blog }) => {
+  try {
+    if (!emails || !Array.isArray(emails) || emails.length === 0) return { success: false, message: 'No recipients' };
+    const transporter = createTransporter();
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const blogUrl = blog.slug ? `${frontendUrl}/blog/${blog.slug}` : frontendUrl;
+    const subject = `📰 New Blog Published: ${blog.title}`;
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(130,5,7,0.08);">
+        <div style="background: linear-gradient(135deg, #820507 0%, #dc2626 50%, #a855f7 100%); color: #fff; padding: 32px 24px; text-align: center;">
+          <h1 style="margin: 0; font-size: 2rem; font-weight: 800;">📰 New Blog Published!</h1>
+          <p style="margin: 10px 0 0 0; font-size: 1.1rem; opacity: 0.95;">${blog.title}</p>
+        </div>
+        ${blog.image ? `<img src="${blog.image}" alt="${blog.title}" style="width: 100%; max-height: 240px; object-fit: cover; border-bottom: 1px solid #eee;" />` : ''}
+        <div style="padding: 28px 24px;">
+          <h2 style="font-size: 1.3rem; color: #820507; margin-bottom: 12px;">${blog.title}</h2>
+          <p style="color: #374151; font-size: 1rem; margin-bottom: 24px;">${blog.excerpt || ''}</p>
+          <a href="${blogUrl}" style="display: inline-block; background: linear-gradient(135deg, #820507 0%, #dc2626 50%, #a855f7 100%); color: #fff; padding: 12px 28px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1rem;">Read Full Article</a>
+        </div>
+        <div style="background: #f8fafc; color: #64748b; text-align: center; padding: 18px 0; font-size: 0.95rem; border-top: 1px solid #eee;">
+          You are receiving this email because you subscribed to TechxServe's newsletter.<br />
+          <a href="${frontendUrl}" style="color: #dc2626; text-decoration: underline;">Visit our website</a>
+        </div>
+      </div>
+    `;
+    const mailOptions = {
+      from: `"TechxServe Newsletter" <${process.env.GMAIL_USER}>`,
+      bcc: emails,
+      subject,
+      html,
+    };
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Blog notification email sent:', info.messageId);
+    return { success: true, message: 'Notification sent' };
+  } catch (error) {
+    console.error('Error sending blog notification email:', error);
+    return { success: false, message: 'Failed to send notification' };
+  }
+};
+
 module.exports = { sendContactEmail, sendJobApplicationEmail };

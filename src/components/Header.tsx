@@ -84,7 +84,7 @@ export default function Header({ currentPage, setCurrentPage }) {
                 } transition-all duration-400`}
               >
                 <ImageWithFallback
-                  src={"/images/logo.png"}
+                  src={"/images/logo.jpg"}
                   alt="TXS Logo"
                   className="w-full h-full object-contain filter drop-shadow-sm"
                 />

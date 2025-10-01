@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -25,125 +25,103 @@ import {
   Filter,
   Grid,
   List,
-  Sidebar
+  Sidebar,
+  X
 } from "lucide-react";
 import OptimizedBackgroundAnimation from "./OptimizedBackgroundAnimation";
 
-// Mock blog data
-const blogPosts = [
-  {
-    id: 1,
-    title: "The Future of SaaS Development: Trends to Watch in 2025",
-    excerpt: "Explore the cutting-edge trends shaping SaaS development, from AI integration to microservices architecture.",
-    content: "Full article content would go here...",
-    author: "Sarah Johnson",
-    date: "2024-12-15",
-    readTime: "8 min read",
-    category: "SaaS Development",
-    tags: ["SaaS", "AI", "Development", "Trends"],
-    image: "https://images.unsplash.com/photo-1636352656650-4baea3fd60e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWFzJTIwY2xvdWQlMjBwbGF0Zm9ybSUyMGRldmVsb3BtZW50fGVufDF8fHx8MTc1NjgzNzE0NHww&ixlib=rb-4.1.0&q=80&w=1080",
-    views: 2400,
-    likes: 89,
-    comments: 23,
-    featured: true
-  },
-  {
-    id: 2,
-    title: "Automating Business Processes: A Complete Guide",
-    excerpt: "Learn how to streamline your operations with intelligent automation solutions that reduce costs and increase efficiency.",
-    content: "Full article content would go here...",
-    author: "Michael Chen",
-    date: "2024-12-12",
-    readTime: "6 min read",
-    category: "Automation",
-    tags: ["Automation", "Business Process", "Efficiency"],
-    image: "https://images.unsplash.com/photo-1647427060118-4911c9821b82?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGF1dG9tYXRpb24lMjB3b3JrZmxvdyUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzU2ODM3MTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    views: 1800,
-    likes: 67,
-    comments: 15,
-    featured: false
-  },
-  {
-    id: 3,
-    title: "Data Analytics: Turning Numbers into Business Insights",
-    excerpt: "Discover how modern data analytics can transform your decision-making process and drive business growth.",
-    content: "Full article content would go here...",
-    author: "Emily Rodriguez",
-    date: "2024-12-10",
-    readTime: "10 min read",
-    category: "Data Analytics",
-    tags: ["Data", "Analytics", "Business Intelligence", "Insights"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwYW5hbHl0aWNzJTIwZGFzaGJvYXJkJTIwdmlzdWFsaXphdGlvbnxlbnwxfHx8fDE3NTY3MzYxNDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    views: 3200,
-    likes: 124,
-    comments: 38,
-    featured: false
-  },
-  {
-    id: 4,
-    title: "Modern Web Development: Best Practices for 2025",
-    excerpt: "Stay ahead with the latest web development technologies and methodologies that deliver exceptional user experiences.",
-    content: "Full article content would go here...",
-    author: "David Park",
-    date: "2024-12-08",
-    readTime: "7 min read",
-    category: "Web Development",
-    tags: ["Web Development", "Frontend", "React", "Performance"],
-    image: "https://images.unsplash.com/photo-1730130054404-c2bd8e7038c2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHx3ZWIlMjBkZXZlbG9wbWVudCUyMGNvZGluZyUyMHdvcmtzcGFjZXxlbnwxfHx8fDE3NTY3MzQ4ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    views: 2100,
-    likes: 78,
-    comments: 19,
-    featured: false
-  },
-  {
-    id: 5,
-    title: "Enterprise Solutions: Scaling Technology for Large Organizations",
-    excerpt: "Understanding the challenges and solutions for implementing technology at enterprise scale.",
-    content: "Full article content would go here...",
-    author: "Jennifer Kim",
-    date: "2024-12-05",
-    readTime: "12 min read",
-    category: "Enterprise Solutions",
-    tags: ["Enterprise", "Scalability", "Architecture", "Integration"],
-    image: "https://images.unsplash.com/photo-1738003946582-aabeabf5e009?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB0ZWNobm9sb2d5JTIwc29sdXRpb25zJTIwZGV2ZWxvcG1lbnR8ZW58MXx8fHwxNzU2ODM3MTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-    views: 1600,
-    likes: 52,
-    comments: 11,
-    featured: false
-  },
-  {
-    id: 6,
-    title: "Cloud Infrastructure: Building for the Future",
-    excerpt: "How cloud-native architecture is revolutionizing software development and deployment strategies.",
-    content: "Full article content would go here...",
-    author: "Alex Thompson",
-    date: "2024-12-03",
-    readTime: "9 min read",
-    category: "Cloud Technology",
-    tags: ["Cloud", "Infrastructure", "DevOps", "Scalability"],
-    image: "https://images.unsplash.com/photo-1636352656650-4baea3fd60e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWFzJTIwY2xvdWQlMjBwbGF0Zm9ybSUyMGRldmVsb3BtZW50fGVufDF8fHx8MTc1NjgzNzE0NHww&ixlib=rb-4.1.0&q=80&w=1080",
-    views: 2800,
-    likes: 95,
-    comments: 27,
-    featured: false
-  }
-];
+// Types for blog data
+type BlogPost = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  date: string;
+  readTime: string;
+  category: string;
+  tags: string[];
+  image: string;
+  views: number;
+  likes: number;
+  commentsCount: number;
+  featured: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
-const categories = [
-  { name: "All", count: blogPosts.length, icon: BookOpen },
-  { name: "SaaS Development", count: 1, icon: Cloud },
-  { name: "Web Development", count: 1, icon: Code },
-  { name: "Automation", count: 1, icon: Zap },
-  { name: "Data Analytics", count: 1, icon: BarChart3 },
-  { name: "Enterprise Solutions", count: 1, icon: Building2 },
-  { name: "Cloud Technology", count: 1, icon: Cloud }
+// Empty array - blogs will be fetched from database
+const mockBlogPosts: BlogPost[] = [];
+
+// Categories will be dynamically generated based on fetched blogs
+const defaultCategories = [
+  { name: "All", count: 0, icon: BookOpen },
+  { name: "SaaS Development", count: 0, icon: Cloud },
+  { name: "Web Development", count: 0, icon: Code },
+  { name: "Automation", count: 0, icon: Zap },
+  { name: "Data Analytics", count: 0, icon: BarChart3 },
+  { name: "Enterprise Solutions", count: 0, icon: Building2 },
+  { name: "Cloud Technology", count: 0, icon: Cloud }
 ];
 
 const BLOGS_PER_PAGE = 6;
 const MAX_BLOGS = 50;
 
+// Blog fetching functions
+const fetchBlogsFromAPI = async (): Promise<BlogPost[]> => {
+  try {
+    const API_BASE = (import.meta as any).env?.VITE_API_URL || "";
+    if (!API_BASE) {
+      console.error("VITE_API_URL not set, cannot fetch blogs from database");
+      throw new Error("API URL not configured");
+    }
+
+    const response = await fetch(`${API_BASE}/api/blogs?page=1&limit=50&status=published`);
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.success && Array.isArray(data.data)) {
+      // Process API blogs only
+      const apiBlogs = data.data.map(blog => ({
+        ...blog,
+        // Ensure tags is always an array
+        tags: Array.isArray(blog.tags) ? blog.tags : (blog.tags ? [blog.tags] : [])
+      }));
+      
+      return apiBlogs;
+    } else {
+      throw new Error("Invalid API response format");
+    }
+  } catch (error) {
+    console.error("Failed to fetch blogs from API:", error);
+    throw error; // Re-throw to handle in component
+  }
+};
+
+const updateCategoriesCount = (blogs: BlogPost[]) => {
+  const categoryCounts: { [key: string]: number } = {};
+  
+  blogs.forEach(blog => {
+    categoryCounts[blog.category] = (categoryCounts[blog.category] || 0) + 1;
+  });
+
+  return [
+    { name: "All", count: blogs.length, icon: BookOpen },
+    { name: "SaaS Development", count: categoryCounts["SaaS Development"] || 0, icon: Cloud },
+    { name: "Web Development", count: categoryCounts["Web Development"] || 0, icon: Code },
+    { name: "Automation", count: categoryCounts["Automation"] || 0, icon: Zap },
+    { name: "Data Analytics", count: categoryCounts["Data Analytics"] || 0, icon: BarChart3 },
+    { name: "Enterprise Solutions", count: categoryCounts["Enterprise Solutions"] || 0, icon: Building2 },
+    { name: "Cloud Technology", count: categoryCounts["Cloud Technology"] || 0, icon: Cloud }
+  ];
+};
+
 // Hero Section
-const BlogHeroSection = () => (
+const BlogHeroSection = ({ searchQuery, onSearchChange, onSearchSubmit }) => (
   <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
     {/* Enhanced Background */}
     <OptimizedBackgroundAnimation intensity="subtle" theme="mixed" />
@@ -195,9 +173,23 @@ const BlogHeroSection = () => (
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-hover:text-[var(--brand-primary)] transition-colors duration-300" />
             <Input
               placeholder="Search articles, topics, and insights..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && onSearchSubmit()}
               className="pl-12 pr-32 py-4 text-lg bg-white/90 backdrop-blur-sm border-2 border-gray-200/50 rounded-2xl shadow-lg hover:shadow-xl focus:shadow-2xl transition-all duration-500 focus:border-[var(--brand-primary)]/50"
             />
-            <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-[var(--brand-primary)] to-red-600 text-white px-6 py-2 rounded-xl hover:scale-105 transition-all duration-300">
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange("")}
+                className="absolute right-24 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            <Button 
+              onClick={onSearchSubmit}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-[var(--brand-primary)] to-red-600 text-white px-6 py-2 rounded-xl hover:scale-105 transition-all duration-300"
+            >
               Search
             </Button>
           </div>
@@ -208,7 +200,7 @@ const BlogHeroSection = () => (
 );
 
 // Featured Post Section
-const FeaturedPostSection = ({ post }) => (
+const FeaturedPostSection = ({ post, onRead }: { post: any; onRead: (event: React.MouseEvent) => void }) => (
   <section className="py-16 relative overflow-hidden">
     {/* Background */}
     <OptimizedBackgroundAnimation intensity="subtle" theme="mixed" />
@@ -280,7 +272,7 @@ const FeaturedPostSection = ({ post }) => (
               </p>
 
               {/* Stats */}
-              <div className="flex items-center space-x-6 text-sm text-gray-500 mb-6">
+              {/* <div className="flex items-center space-x-6 text-sm text-gray-500 mb-6">
                 <div className="flex items-center">
                   <Eye className="w-4 h-4 mr-1" />
                   {post.views.toLocaleString()}
@@ -291,11 +283,11 @@ const FeaturedPostSection = ({ post }) => (
                 </div>
                 <div className="flex items-center">
                   <MessageCircle className="w-4 h-4 mr-1" />
-                  {post.comments}
+                  {post.commentsCount}
                 </div>
-              </div>
+              </div> */}
 
-              <Button className="group relative w-fit bg-gradient-to-r from-[var(--brand-primary)] to-red-600 text-white px-8 py-3 rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+              <Button onClick={onRead} className="group relative w-fit bg-gradient-to-r from-[var(--brand-primary)] to-red-600 text-white px-8 py-3 rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden">
                 <span className="relative z-10 flex items-center">
                   Read Full Article
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
@@ -311,7 +303,7 @@ const FeaturedPostSection = ({ post }) => (
 );
 
 // Categories Section
-const CategoriesSection = ({ selectedCategory, onCategorySelect }) => (
+const CategoriesSection = ({ selectedCategory, onCategorySelect, categories }) => (
   <section className="py-16 relative overflow-hidden">
     {/* Background */}
     <OptimizedBackgroundAnimation intensity="subtle" theme="mixed" />
@@ -374,7 +366,7 @@ const CategoriesSection = ({ selectedCategory, onCategorySelect }) => (
 );
 
 // Blog Posts Grid
-const BlogPostsGrid = ({ posts, layout = "grid" }) => (
+const BlogPostsGrid = ({ posts, layout = "grid", onOpenPost }: { posts: any[]; layout?: "grid" | "list"; onOpenPost: (post: any, event: React.MouseEvent) => void }) => (
   <section className="py-16 relative overflow-hidden">
     {/* Background */}
     <OptimizedBackgroundAnimation intensity="subtle" theme="mixed" />
@@ -388,7 +380,7 @@ const BlogPostsGrid = ({ posts, layout = "grid" }) => (
       }`}>
         {posts.map((post, index) => (
           <motion.article
-            key={post.id}
+            key={post._id}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: index * 0.1 }}
@@ -448,7 +440,7 @@ const BlogPostsGrid = ({ posts, layout = "grid" }) => (
 
               {/* Stats and Read More */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                {/* <div className="flex items-center space-x-4 text-sm text-gray-500">
                   <div className="flex items-center">
                     <Clock className="w-4 h-4 mr-1" />
                     {post.readTime}
@@ -457,11 +449,12 @@ const BlogPostsGrid = ({ posts, layout = "grid" }) => (
                     <Eye className="w-4 h-4 mr-1" />
                     {post.views.toLocaleString()}
                   </div>
-                </div>
+                </div> */}
 
                 <Button
                   variant="ghost"
                   className="text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10 p-2 rounded-full group/btn"
+                  onClick={(e) => onOpenPost(post, e)}
                 >
                   <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
                 </Button>
@@ -469,7 +462,7 @@ const BlogPostsGrid = ({ posts, layout = "grid" }) => (
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mt-4">
-                {post.tags.slice(0, 3).map((tag, tagIndex) => (
+                {(Array.isArray(post.tags) ? post.tags : []).slice(0, 3).map((tag, tagIndex) => (
                   <span
                     key={tagIndex}
                     className="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs hover:bg-[var(--brand-primary)]/10 hover:text-[var(--brand-primary)] transition-colors duration-200"
@@ -486,8 +479,121 @@ const BlogPostsGrid = ({ posts, layout = "grid" }) => (
   </section>
 );
 
+// Article Modal
+const ArticleModal = ({ post, onClose, clickPosition }: { post: any; onClose: () => void; clickPosition?: { x: number; y: number } }) => {
+  return (
+    <AnimatePresence>
+      {post && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            className="relative z-10 w-full max-w-3xl mx-auto m-6 md:m-10"
+            initial={{ 
+              x: clickPosition ? clickPosition.x - window.innerWidth / 2 : 0,
+              y: clickPosition ? clickPosition.y - window.innerHeight / 2 : 40,
+              opacity: 0, 
+              scale: 0.5 
+            }}
+            animate={{ 
+              x: 0,
+              y: 0, 
+              opacity: 1, 
+              scale: 1 
+            }}
+            exit={{ 
+              x: clickPosition ? clickPosition.x - window.innerWidth / 2 : 0,
+              y: clickPosition ? clickPosition.y - window.innerHeight / 2 : 20,
+              opacity: 0, 
+              scale: 0.5 
+            }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 30,
+              duration: 0.4
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-gray-200/50 shadow-2xl">
+              <button
+                aria-label="Close"
+                onClick={onClose}
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/70 hover:bg-white shadow border border-gray-200 text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Cover */}
+              <div className="relative h-64 w-full overflow-hidden rounded-t-3xl">
+                <ImageWithFallback
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute top-4 left-4">
+                  <span className="px-4 py-2 bg-[var(--brand-primary)] text-white rounded-full font-semibold shadow-lg">
+                    {post.category}
+                  </span>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 md:p-8">
+                <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center"><User className="w-4 h-4 mr-1" />{post.author}</div>
+                  <div className="flex items-center"><Calendar className="w-4 h-4 mr-1" />{new Date(post.date).toLocaleDateString()}</div>
+                  {/* <div className="flex items-center"><Clock className="w-4 h-4 mr-1" />{post.readTime}</div> */}
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">{post.title}</h3>
+                <p className="text-gray-600 mb-6">{post.excerpt}</p>
+
+                {/* Content */}
+                <div className="prose prose-gray max-w-none">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {post.content}
+                  </p>
+                </div>
+
+                {/* Tags */}
+                {Array.isArray(post.tags) && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-6">
+                    {post.tags.map((tag: string, i: number) => (
+                      <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Stats */}
+                {/* <div className="flex items-center space-x-6 text-sm text-gray-500 mt-6">
+                  <div className="flex items-center"><Eye className="w-4 h-4 mr-1" />{(post.views ?? 0).toLocaleString()}</div>
+                  <div className="flex items-center"><Heart className="w-4 h-4 mr-1" />{post.likes ?? 0}</div>
+                  <div className="flex items-center"><MessageCircle className="w-4 h-4 mr-1" />{post.commentsCount ?? 0}</div>
+                </div> */}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 // Sidebar Component
-const BlogSidebar = ({ selectedCategory, onCategorySelect }) => (
+const BlogSidebar = ({ selectedCategory, onCategorySelect, categories, recentPosts, searchQuery, onSearchChange }) => (
   <aside className="w-80 bg-white/90 backdrop-blur-sm border-r border-gray-200/50 sticky top-24 h-fit">
     {/* Background Animation in Sidebar */}
     <div className="absolute inset-0 overflow-hidden opacity-30">
@@ -502,6 +608,8 @@ const BlogSidebar = ({ selectedCategory, onCategorySelect }) => (
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 bg-white border-gray-200/50 rounded-xl"
           />
         </div>
@@ -544,8 +652,8 @@ const BlogSidebar = ({ selectedCategory, onCategorySelect }) => (
       <div className="mb-8">
         <h3 className="font-bold text-gray-900 mb-4">Recent Posts</h3>
         <div className="space-y-4">
-          {blogPosts.slice(0, 3).map((post) => (
-            <div key={post.id} className="group cursor-pointer">
+          {recentPosts.slice(0, 3).map((post) => (
+            <div key={post._id} className="group cursor-pointer">
               <div className="flex space-x-3">
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                   <ImageWithFallback
@@ -642,13 +750,109 @@ export default function BlogPage({ setCurrentPage }) {
   const [layoutType, setLayoutType] = useState("grid"); // "grid" or "sidebar"
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPageNumber] = useState(1);
+  const [blogs, setBlogs] = useState<BlogPost[]>(mockBlogPosts);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activePost, setActivePost] = useState<BlogPost | null>(null);
+  const [clickPosition, setClickPosition] = useState<{ x: number; y: number } | undefined>(undefined);
 
-  // Filter posts based on selected category
-  const filteredPosts = blogPosts
-    .filter(post => selectedCategory === "All" || post.category === selectedCategory)
-    .slice(0, MAX_BLOGS);
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    if (activePost) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = original; };
+    }
+  }, [activePost]);
 
-  const featuredPost = blogPosts.find(post => post.featured) || blogPosts[0];
+  // Handle opening modal with click position
+  const handleOpenModal = (post: BlogPost, event: React.MouseEvent, section: 'featured' | 'grid') => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    let targetY = rect.top + rect.height / 2;
+    
+    // Adjust position based on section
+    if (section === 'featured') {
+      // Keep modal in featured section area (upper part of screen)
+      targetY = Math.min(targetY, window.innerHeight * 0.4);
+    } else if (section === 'grid') {
+      // Determine if it's in first 3 or last 3 articles
+      const articleIndex = paginatedPosts.findIndex(p => p._id === post._id);
+      if (articleIndex < 3) {
+        // First 3 articles - position in upper grid area
+        targetY = Math.min(targetY, window.innerHeight * 0.6);
+      } else {
+        // Last 3 articles - position in lower grid area
+        targetY = Math.max(targetY, window.innerHeight * 0.4);
+      }
+    }
+    
+    setClickPosition({ x: rect.left + rect.width / 2, y: targetY });
+    setActivePost(post);
+  };
+
+  // Handle closing modal
+  const handleCloseModal = () => {
+    setActivePost(null);
+    setClickPosition(undefined);
+  };
+
+  // Handle search
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+
+  const handleSearchSubmit = () => {
+    // Search is handled automatically via the filteredPosts useMemo
+    // This function can be used for additional search logic if needed
+  };
+
+  // Fetch blogs on component mount
+  useEffect(() => {
+    const loadBlogs = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const fetchedBlogs = await fetchBlogsFromAPI();
+        setBlogs(fetchedBlogs);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load blogs from database");
+        console.error("Error loading blogs:", err);
+        setBlogs([]); // Set empty array on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBlogs();
+  }, []);
+
+  // Get dynamic categories based on fetched blogs
+  const dynamicCategories = useMemo(() => updateCategoriesCount(blogs), [blogs]);
+
+  // Search function
+  const searchPosts = (posts: BlogPost[], query: string) => {
+    if (!query.trim()) return posts;
+    
+    const lowercaseQuery = query.toLowerCase();
+    return posts.filter(post => 
+      post.title.toLowerCase().includes(lowercaseQuery) ||
+      post.excerpt.toLowerCase().includes(lowercaseQuery) ||
+      post.content.toLowerCase().includes(lowercaseQuery) ||
+      post.author.toLowerCase().includes(lowercaseQuery) ||
+      post.category.toLowerCase().includes(lowercaseQuery) ||
+      post.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
+    );
+  };
+
+  // Filter posts based on selected category and search query
+  const filteredPosts = useMemo(() => {
+    let filtered = blogs.filter(post => selectedCategory === "All" || post.category === selectedCategory);
+    filtered = searchPosts(filtered, searchQuery);
+    return filtered.slice(0, MAX_BLOGS);
+  }, [blogs, selectedCategory, searchQuery]);
+
+  // Get featured post from filtered posts, or first post if no featured post in category
+  const featuredPost = filteredPosts.find(post => post.featured) || filteredPosts[0];
 
   // Pagination logic
   const totalPages = Math.ceil(filteredPosts.length / BLOGS_PER_PAGE);
@@ -660,17 +864,123 @@ export default function BlogPage({ setCurrentPage }) {
   // Reset to page 1 if filter changes
   React.useEffect(() => {
     setCurrentPageNumber(1);
-  }, [selectedCategory]);
+  }, [selectedCategory, searchQuery]);
+
+  // Clear search function
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brand-primary)] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading blogs...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Blogs</h3>
+            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-gray-600 text-sm">Please check your connection and try again, or contact the administrator.</p>
+          </div>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary)]/90"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state when no blogs are found
+  if (!loading && blogs.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Blogs Available</h3>
+            <p className="text-gray-600 mb-4">There are no published blog posts at the moment.</p>
+            <p className="text-gray-500 text-sm">Check back later or contact the administrator to add content.</p>
+          </div>
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline"
+            className="border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10"
+          >
+            Refresh Page
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (layoutType === "sidebar") {
     return (
       <div className="min-h-screen">
-        <BlogHeroSection />
+        <BlogHeroSection 
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+        />
+        
+        {/* Search Results Indicator */}
+        {searchQuery && (
+          <div className="container mx-auto px-6 py-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 p-4 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Search className="w-5 h-5 text-[var(--brand-primary)]" />
+                    <span className="text-gray-700">
+                      Search results for "<span className="font-semibold text-[var(--brand-primary)]">{searchQuery}</span>"
+                    </span>
+                    <span className="px-3 py-1 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-full text-sm font-medium">
+                      {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''} found
+                    </span>
+                  </div>
+                  <Button
+                    onClick={clearSearch}
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Clear Search
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="flex min-h-screen">
           <BlogSidebar 
             selectedCategory={selectedCategory}
             onCategorySelect={setSelectedCategory}
+            categories={dynamicCategories}
+            recentPosts={blogs}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
           />
           
           <main className="flex-1">
@@ -702,7 +1012,31 @@ export default function BlogPage({ setCurrentPage }) {
               </div>
             </div>
             
-            <BlogPostsGrid posts={paginatedPosts} layout="list" />
+            {searchQuery && filteredPosts.length === 0 ? (
+              <div className="py-16 text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No articles found</h3>
+                  <p className="text-gray-600 mb-4">
+                    No articles match your search for "<span className="font-medium">{searchQuery}</span>"
+                  </p>
+                  <p className="text-gray-500 text-sm mb-6">
+                    Try different keywords or browse our categories in the sidebar.
+                  </p>
+                  <Button
+                    onClick={clearSearch}
+                    variant="outline"
+                    className="border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10"
+                  >
+                    Clear Search
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <BlogPostsGrid posts={paginatedPosts} layout="list" onOpenPost={(p, e) => handleOpenModal(p, e, 'grid')} />
+            )}
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex justify-center my-8 space-x-2">
@@ -735,17 +1069,55 @@ export default function BlogPage({ setCurrentPage }) {
             <BlogCTASection setCurrentPage={setCurrentPage} />
           </main>
         </div>
+        <ArticleModal post={activePost} onClose={handleCloseModal} clickPosition={clickPosition} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <BlogHeroSection />
-      <FeaturedPostSection post={featuredPost} />
+      <div className="min-h-screen">
+      <BlogHeroSection 
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        onSearchSubmit={handleSearchSubmit}
+      />
+        {/* Search Results Indicator */}
+        {searchQuery && (
+          <div className="container mx-auto px-6 py-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 p-4 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Search className="w-5 h-5 text-[var(--brand-primary)]" />
+                    <span className="text-gray-700">
+                      Search results for "<span className="font-semibold text-[var(--brand-primary)]">{searchQuery}</span>"
+                    </span>
+                    <span className="px-3 py-1 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-full text-sm font-medium">
+                      {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''} found
+                    </span>
+                  </div>
+                  <Button
+                    onClick={clearSearch}
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Clear Search
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {featuredPost && !searchQuery && (
+          <FeaturedPostSection post={featuredPost} onRead={(e) => handleOpenModal(featuredPost, e, 'featured')} />
+        )}
       <CategoriesSection 
         selectedCategory={selectedCategory}
         onCategorySelect={setSelectedCategory}
+        categories={dynamicCategories}
       />
       
       {/* Layout Toggle */}
@@ -776,7 +1148,31 @@ export default function BlogPage({ setCurrentPage }) {
         </div>
       </div>
       
-      <BlogPostsGrid posts={paginatedPosts} layout={layoutType} />
+      {searchQuery && filteredPosts.length === 0 ? (
+        <div className="py-16 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No articles found</h3>
+            <p className="text-gray-600 mb-4">
+              No articles match your search for "<span className="font-medium">{searchQuery}</span>"
+            </p>
+            <p className="text-gray-500 text-sm mb-6">
+              Try different keywords or browse our categories below.
+            </p>
+            <Button
+              onClick={clearSearch}
+              variant="outline"
+              className="border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10"
+            >
+              Clear Search
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <BlogPostsGrid posts={paginatedPosts} layout="grid" onOpenPost={(p, e) => handleOpenModal(p, e, 'grid')} />
+      )}
       {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex justify-center my-8 space-x-2">
@@ -807,6 +1203,7 @@ export default function BlogPage({ setCurrentPage }) {
         </div>
       )}
       <BlogCTASection setCurrentPage={setCurrentPage} />
+      <ArticleModal post={activePost} onClose={handleCloseModal} clickPosition={clickPosition} />
     </div>
   );
 }
