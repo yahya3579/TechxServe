@@ -92,6 +92,10 @@ export default function AdminPage() {
     setError(null);
     
     try {
+      // Create a preview URL immediately for better UX
+      const previewUrl = URL.createObjectURL(file);
+      setUploadedImage(previewUrl);
+      
       const formData = new FormData();
       formData.append('image', file);
       
@@ -103,11 +107,15 @@ export default function AdminPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || 'Failed to upload image');
       
+      // Clean up the preview URL and set the actual server URL
+      URL.revokeObjectURL(previewUrl);
       setUploadedImage(data.imageUrl);
       handleChange('image', data.imageUrl);
       setMessage('Image uploaded successfully!');
     } catch (err: any) {
       setError(err?.message || 'Failed to upload image');
+      // Clear preview on error
+      setUploadedImage(null);
     } finally {
       setImageUploading(false);
     }
@@ -133,6 +141,10 @@ export default function AdminPage() {
   };
 
   const removeImage = () => {
+    // Clean up blob URL if it exists
+    if (uploadedImage && uploadedImage.startsWith('blob:')) {
+      URL.revokeObjectURL(uploadedImage);
+    }
     setUploadedImage(null);
     handleChange('image', '');
     if (fileInputRef.current) {
@@ -355,6 +367,15 @@ export default function AdminPage() {
     }
   }, [API_BASE]);
 
+  // Cleanup blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (uploadedImage && uploadedImage.startsWith('blob:')) {
+        URL.revokeObjectURL(uploadedImage);
+      }
+    };
+  }, [uploadedImage]);
+
   // Handle successful login
   const handleLogin = (email: string) => {
     setIsAuthenticated(true);
@@ -555,9 +576,14 @@ export default function AdminPage() {
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                       <div className="flex items-center space-x-4">
                         <img
-                          src={uploadedImage}
+                          src={uploadedImage.startsWith('blob:') ? uploadedImage : `${API_BASE}${uploadedImage}`}
                           alt="Uploaded preview"
                           className="w-20 h-20 object-cover rounded-lg"
+                          onError={(e) => {
+                            console.error('Image failed to load:', uploadedImage);
+                            // Use a data URI for a simple placeholder
+                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik00MCAyMEM0NS41MjI4IDIwIDUwIDI0LjQ3NzIgNTAgMzBDNTAgMzUuNTIyOCA0NS41MjI4IDQwIDQwIDQwQzM0LjQ3NzIgNDAgMzAgMzUuNTIyOCAzMCAzMEMzMCAyNC40NzcyIDM0LjQ3NzIgMjAgNDAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xMCA2MEwyMCA1MEwzMCA2MEw1MCA0MEw3MCA2MFY3MEgxMFY2MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
+                          }}
                         />
                         <div className="flex-1">
                           <p className="text-sm text-gray-600">Image uploaded successfully</p>
