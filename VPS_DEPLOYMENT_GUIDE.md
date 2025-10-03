@@ -193,6 +193,32 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
+    # --- BLOG IMAGES ---
+    # To serve blog images correctly, you must add a location block for /blogs/.
+    # You can either proxy to Node.js (recommended for access control/logging),
+    # or serve directly from disk (faster, but bypasses Node.js).
+
+    # Option 1: Proxy /blogs/ to Node.js backend (recommended)
+    location /blogs/ {
+        proxy_pass http://localhost:3001/blogs/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Option 2: Serve /blogs/ directly from disk (fastest, bypasses Node.js)
+    # Uncomment this block and comment out the proxy_pass block above if you want Nginx to serve images directly:
+    # location /blogs/ {
+    #     alias /var/www/techxserve/public/blogs/;
+    #     autoindex off;
+    #     add_header Cache-Control "public, max-age=31536000";
+    # }
+
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-XSS-Protection "1; mode=block" always;

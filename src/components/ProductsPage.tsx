@@ -97,60 +97,62 @@ const SaaSProductsSection = () => {
   const saasProducts = [
     {
       id: "analytics-pro",
-      name: "Analytics Pro",
-      tagline: "Advanced business intelligence platform",
+      name: "Employee Remote Tracking System",
+      tagline: "Advanced employee tracking with live screenshots, app usage and time tracking",
       features: [
         "Real-time data visualization",
-        "Custom dashboard creation", 
-        "AI-powered insights",
-        "Multi-source data integration"
+        "Admin and User Dashboards", 
+        "Responsive Design",
+        "User Friendly UI of Desktop Application for Employees."
       ],
-      screenshot: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwYW5hbHl0aWNzJTIwZGFzaGJvYXJkJTIwdmlzdWFsaXphdGlvbnxlbnwxfHx8fDE3NTY3MzYxNDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      screenshot: "/images/tracking.jpg",
       color: "from-emerald-500 to-emerald-700",
-      icon: BarChart3
+      icon: BarChart3,
+      link: "https://tracking-three-kappa.vercel.app/"
     },
     {
       id: "secure-vault", 
-      name: "SecureVault",
-      tagline: "Enterprise-grade data protection",
+      name: "FBR Invoicing",
+      tagline: "Register your invoices with FBR Integration API",
       features: [
         "End-to-end encryption",
-        "Compliance management",
-        "Access control matrix",
-        "Audit trail tracking"
+        "Auto Invoice Registration after Saving of Invoice.",
+        "Upload bulk of invoices to get registered",
+        "Contact Support"
       ],
-      screenshot: "https://images.unsplash.com/photo-1563206767-5b18f218e8de?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwc2VjdXJpdHklMjBjeWJlcnNlY3VyaXR5JTIwcHJvdGVjdGlvbnxlbnwxfHx8fDE3NTY4MzczMzN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      screenshot: "/images/fbrInvoicing.webp",
       color: "from-blue-500 to-blue-700",
-      icon: Shield
+      icon: Shield,
+      link: "https://fbr-invoicing.vercel.app/"
     },
-    {
-      id: "workflow-engine",
-      name: "WorkflowEngine",
-      tagline: "Intelligent process automation",
-      features: [
-        "No-code workflow builder",
-        "Smart trigger systems", 
-        "Multi-platform integration",
-        "Performance analytics"
-      ],
-      screenshot: "https://images.unsplash.com/photo-1647427060118-4911c9821b82?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGF1dG9tYXRpb24lMjB3b3JrZmxvdyUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzU2ODM3MTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      color: "from-purple-500 to-purple-700",
-      icon: Zap
-    },
-    {
-      id: "cloud-sync",
-      name: "CloudSync",
-      tagline: "Seamless multi-cloud orchestration",
-      features: [
-        "Cross-platform sync",
-        "Automated backups",
-        "Version control",
-        "Team collaboration"
-      ],
-      screenshot: "https://images.unsplash.com/photo-1636352656650-4baea3fd60e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWFzJTIwY2xvdWQlMjBwbGF0Zm9ybSUyMGRldmVsb3BtZW50fGVufDF8fHx8MTc1NjgzNzE0NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      color: "from-orange-500 to-orange-700",
-      icon: Globe
-    }
+    // {
+    //   id: "workflow-engine",
+    //   name: "WorkflowEngine",
+    //   tagline: "Intelligent process automation",
+    //   features: [
+    //     "No-code workflow builder",
+    //     "Smart trigger systems", 
+    //     "Multi-platform integration",
+    //     "Performance analytics"
+    //   ],
+    //   screenshot: "https://images.unsplash.com/photo-1647427060118-4911c9821b82?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGF1dG9tYXRpb24lMjB3b3JrZmxvdyUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzU2ODM3MTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    //   color: "from-purple-500 to-purple-700",
+    //   icon: Zap
+    // },
+    // {
+    //   id: "cloud-sync",
+    //   name: "CloudSync",
+    //   tagline: "Seamless multi-cloud orchestration",
+    //   features: [
+    //     "Cross-platform sync",
+    //     "Automated backups",
+    //     "Version control",
+    //     "Team collaboration"
+    //   ],
+    //   screenshot: "https://images.unsplash.com/photo-1636352656650-4baea3fd60e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWFzJTIwY2xvdWQlMjBwbGF0Zm9ybSUyMGRldmVsb3BtZW50fGVufDF8fHx8MTc1NjgzNzE0NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    //   color: "from-orange-500 to-orange-700",
+    //   icon: Globe
+    // }
   ];
 
   return (
@@ -197,15 +199,6 @@ const SaaSProductsSection = () => {
                   />
                   <div className={`absolute inset-0 bg-gradient-to-t ${product.color}/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                   
-                  {/* Play button overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.div
-                      className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      whileHover={{ scale: 1.1 }}
-                    >
-                      <Play className="w-8 h-8 text-white ml-1" />
-                    </motion.div>
-                  </div>
                 </div>
 
                 {/* Content */}
@@ -243,12 +236,17 @@ const SaaSProductsSection = () => {
                     </div>
                   </div>
 
-                  <Button className={`w-full bg-gradient-to-r ${product.color} text-white hover:shadow-lg transition-all duration-300 rounded-xl py-3 group/btn`}>
+                  <a
+                    href={product.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-full bg-gradient-to-r ${product.color} text-white hover:shadow-lg transition-all duration-300 rounded-xl py-3 group/btn flex items-center justify-center no-underline`}
+                  >
                     <span className="flex items-center justify-center">
                       Learn More
                       <ExternalLink className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" />
                     </span>
-                  </Button>
+                  </a>
                 </div>
               </div>
             </motion.div>

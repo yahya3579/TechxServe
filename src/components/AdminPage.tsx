@@ -109,6 +109,9 @@ export default function AdminPage() {
       
       // Clean up the preview URL and set the actual server URL
       URL.revokeObjectURL(previewUrl);
+      console.log('Server response:', data);
+      console.log('Image URL from server:', data.imageUrl);
+      console.log('Full URL would be:', `${API_BASE}${data.imageUrl}`);
       setUploadedImage(data.imageUrl);
       handleChange('image', data.imageUrl);
       setMessage('Image uploaded successfully!');
@@ -579,8 +582,12 @@ export default function AdminPage() {
                           src={uploadedImage.startsWith('blob:') ? uploadedImage : `${API_BASE}${uploadedImage}`}
                           alt="Uploaded preview"
                           className="w-20 h-20 object-cover rounded-lg"
+                          onLoad={() => {
+                            console.log('Image loaded successfully:', uploadedImage.startsWith('blob:') ? uploadedImage : `${API_BASE}${uploadedImage}`);
+                          }}
                           onError={(e) => {
                             console.error('Image failed to load:', uploadedImage);
+                            console.error('Attempted URL:', uploadedImage.startsWith('blob:') ? uploadedImage : `${API_BASE}${uploadedImage}`);
                             // Use a data URI for a simple placeholder
                             e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik00MCAyMEM0NS41MjI4IDIwIDUwIDI0LjQ3NzIgNTAgMzBDNTAgMzUuNTIyOCA0NS41MjI4IDQwIDQwIDQwQzM0LjQ3NzIgNDAgMzAgMzUuNTIyOCAzMCAzMEMzMCAyNC40NzcyIDM0LjQ3NzIgMjAgNDAgMjBaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xMCA2MEwyMCA1MEwzMCA2MEw1MCA0MEw3MCA2MFY3MEgxMFY2MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';
                           }}
