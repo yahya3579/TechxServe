@@ -3,11 +3,16 @@ const nodemailer = require('nodemailer');
 // Create transporter
 const createTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'mail.techxserve.co',
+    port: 465,
+    secure: true, // true for 465, false for other ports
     auth: {
-      user: process.env.GMAIL_USER,
+      user: process.env.GMAIL_USER || 'info@techxserve.co',
       pass: process.env.GMAIL_APP_PASSWORD,
     },
+    tls: {
+      rejectUnauthorized: false
+    }
   });
 };
 
@@ -606,4 +611,4 @@ const sendBlogNotificationEmail = async ({ emails, blog }) => {
   }
 };
 
-module.exports = { sendContactEmail, sendJobApplicationEmail };
+module.exports = { sendContactEmail, sendJobApplicationEmail, sendBlogNotificationEmail };

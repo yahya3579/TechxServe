@@ -96,9 +96,9 @@ nano .env
 Add the following content:
 ```env
 # Gmail Configuration for Email Service
-GMAIL_USER=your-email@gmail.com
+GMAIL_USER=info@techxserve.co
 GMAIL_APP_PASSWORD=your-16-character-app-password
-RECIPIENT_EMAIL=your-email@gmail.com
+RECIPIENT_EMAIL=info@techxserve.co
 
 # Server Configuration
 PORT=3001

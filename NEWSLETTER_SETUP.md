@@ -18,7 +18,7 @@ MONGODB_URI=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/techxserv
 DB_NAME=techxserve
 
 # Email Configuration
-GMAIL_USER=your-email@gmail.com
+GMAIL_USER=info@techxserve.co
 GMAIL_APP_PASSWORD=your-16-character-app-password
 RECIPIENT_EMAIL=info@techxserve.co
 
