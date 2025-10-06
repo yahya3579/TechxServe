@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const BlogPost = require('./src/models/BlogPost.js');
 const Admin = require('./src/models/Admin.js');
-const { sendContactEmail, sendJobApplicationEmail, sendBlogNotificationEmail } = require('./src/utils/emailService.js');
+const { sendContactEmail, sendJobApplicationEmail, sendMediaInquiryEmail, sendBlogNotificationEmail } = require('./src/utils/emailService.js');
 const { connectToDatabase } = require('./src/utils/database.js');
 const NewsletterService = require('./src/utils/newsletterService.js');
 const Subscriber = require('./src/models/Subscriber.js');
@@ -599,6 +599,62 @@ app.post('/api/contact', async (req, res) => {
     }
   } catch (error) {
     console.error('Contact form API error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong. Please try again later.',
+    });
+  }
+});
+
+// Media inquiry endpoint
+app.post('/api/media-inquiry', async (req, res) => {
+  try {
+    const body = req.body;
+    
+    // Validate required fields
+    const requiredFields = ['name', 'email', 'project'];
+    const missingFields = requiredFields.filter(field => !body[field] || body[field].trim() === '');
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(body.email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.',
+      });
+    }
+
+    // Prepare form data
+    const formData = {
+      name: body.name.trim(),
+      email: body.email.trim().toLowerCase(),
+      project: body.project.trim(),
+      message: body.message?.trim() || '',
+    };
+
+    // Send email
+    const result = await sendMediaInquiryEmail(formData);
+
+    if (result.success) {
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.error('Media inquiry API error:', error);
     return res.status(500).json({
       success: false,
       message: 'Something went wrong. Please try again later.',

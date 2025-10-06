@@ -545,7 +545,7 @@ const MediaAboutSection = () => (
 // Portfolio section
 const MediaPortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("All");
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
   
   // const filters = ['All', 'Video', 'Design', 'Branding']
   const filters = ["All", "Video",];
@@ -824,7 +824,7 @@ const MediaContactSection = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState({ type: null, message: '' });
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
 
   const handleInputChange = (e) => {
     setFormData({
@@ -839,21 +839,16 @@ const MediaContactSection = () => {
     setSubmitStatus({ type: null, message: '' });
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://techxserve.co'}/api/contact`, {
+      const response = await fetch(`${(import.meta as any).env?.VITE_API_URL || 'https://techxserve.co'}/api/media-inquiry`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          fullName: formData.name,
+          name: formData.name,
           email: formData.email,
-          phone: '', // Not collected in this form
-          company: 'Media Inquiry', // Default for media page
-          service: formData.project,
-          timeline: 'Not specified',
-          budget: 'Not specified',
-          source: 'Media Page Contact Form',
-          projectDetails: formData.message
+          project: formData.project,
+          message: formData.message
         }),
       });
 
@@ -937,12 +932,15 @@ const MediaContactSection = () => {
               viewport={{ once: true }}
             >
               {[
-                { icon: Mail, label: "info@techxserve.co", type: "email" },
-                { icon: Phone, label: "+1 (307) 293-9151", type: "phone" },
-                { icon: MapPin, label: "30 N Gould St Ste N, Sheridan, WY 82801 USA", type: "location" },
+                { icon: Mail, label: "media@techxserve.co", type: "email", href: "mailto:media@techxserve.co" },
+                { icon: Phone, label: "+1 (307) 293-9151", type: "phone", href: "tel:+13072939151" },
+                { icon: MapPin, label: "30 N Gould St Ste N, Sheridan, WY 82801 USA", type: "location", href: "https://maps.google.com/?q=30+N+Gould+St+Ste+N,+Sheridan,+WY+82801+USA" },
               ].map((contact, index) => (
-                <motion.div
+                <motion.a
                   key={contact.type}
+                  href={contact.href}
+                  target={contact.type === "location" ? "_blank" : "_self"}
+                  rel={contact.type === "location" ? "noopener noreferrer" : undefined}
                   className="flex items-center space-x-4 group cursor-pointer"
                   whileHover={{ x: 10 }}
                   transition={{ duration: 0.3 }}
@@ -956,7 +954,7 @@ const MediaContactSection = () => {
                   <span className="text-white/80 group-hover:text-white transition-colors duration-300">
                     {contact.label}
                   </span>
-                </motion.div>
+                </motion.a>
               ))}
             </motion.div>
           </motion.div>

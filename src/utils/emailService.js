@@ -570,6 +570,82 @@ Submitted on: ${new Date().toLocaleString()}
   }
 };
 
+// Send media inquiry email
+const sendMediaInquiryEmail = async (formData) => {
+  try {
+    const transporter = createTransporter();
+    
+    const mailOptions = {
+      from: `"TechxServe Media" <${process.env.GMAIL_USER || 'info@techxserve.co'}>`,
+      to: 'media@techxserve.co',
+      subject: `🎬 New Media Inquiry from ${formData.name} - ${formData.project}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(130,5,7,0.08);">
+          <div style="background: linear-gradient(135deg, #820507 0%, #dc2626 50%, #a855f7 100%); color: #fff; padding: 32px 24px; text-align: center;">
+            <h1 style="margin: 0; font-size: 2rem; font-weight: 800;">🎬 New Media Inquiry</h1>
+            <p style="margin: 10px 0 0 0; font-size: 1.1rem; opacity: 0.95;">TechxServe Media - Creative Projects</p>
+          </div>
+          
+          <div style="padding: 28px 24px;">
+            <h2 style="font-size: 1.3rem; color: #820507; margin-bottom: 12px;">Project Details</h2>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+              <h3 style="color: #333; margin-bottom: 15px;">👤 Client Information</h3>
+              <p><strong>Name:</strong> ${formData.name}</p>
+              <p><strong>Email:</strong> ${formData.email}</p>
+              <p><strong>Project Type:</strong> ${formData.project}</p>
+            </div>
+            
+            ${formData.message ? `
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+              <h3 style="color: #333; margin-bottom: 15px;">💬 Project Description</h3>
+              <p style="white-space: pre-wrap; line-height: 1.6;">${formData.message}</p>
+            </div>
+            ` : ''}
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="mailto:${formData.email}" style="display: inline-block; background: linear-gradient(135deg, #820507 0%, #dc2626 50%, #a855f7 100%); color: #fff; padding: 12px 28px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1rem; margin-right: 10px;">📧 Reply to Client</a>
+              <a href="tel:+13072939151" style="display: inline-block; background: #10b981; color: #fff; padding: 12px 28px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1rem;">📞 Call Now</a>
+            </div>
+          </div>
+          
+          <div style="background: #f8fafc; color: #64748b; text-align: center; padding: 18px 0; font-size: 0.95rem; border-top: 1px solid #eee;">
+            Submitted on: ${new Date().toLocaleString()}<br />
+            Source: Media Page Contact Form
+          </div>
+        </div>
+      `,
+      text: `
+New Media Inquiry
+
+Name: ${formData.name}
+Email: ${formData.email}
+Project Type: ${formData.project}
+
+Project Description:
+${formData.message || 'No description provided'}
+
+Submitted on: ${new Date().toLocaleString()}
+Source: Media Page Contact Form
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Media inquiry email sent successfully:', info.messageId);
+    
+    return {
+      success: true,
+      message: 'Media inquiry sent successfully! We\'ll get back to you soon.'
+    };
+  } catch (error) {
+    console.error('Error sending media inquiry email:', error);
+    return {
+      success: false,
+      message: 'Failed to send media inquiry. Please try again later.'
+    };
+  }
+};
+
 // Send blog notification email to newsletter subscribers
 const sendBlogNotificationEmail = async ({ emails, blog }) => {
   try {
@@ -611,4 +687,4 @@ const sendBlogNotificationEmail = async ({ emails, blog }) => {
   }
 };
 
-module.exports = { sendContactEmail, sendJobApplicationEmail, sendBlogNotificationEmail };
+module.exports = { sendContactEmail, sendJobApplicationEmail, sendMediaInquiryEmail, sendBlogNotificationEmail };
