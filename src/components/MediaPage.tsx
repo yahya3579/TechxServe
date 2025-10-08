@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { motion } from "motion/react";
+import React, { useState, useMemo } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -23,31 +23,29 @@ import {
   Layers
 } from "lucide-react";
 
-// Futuristic particle animation background
+// Optimized Futuristic Background - Reduced particles dramatically
 const FuturisticBackground = ({ variant = "default", className = "" }) => {
-  const particleCount = variant === "hero" ? 80 : 40;
+  const prefersReducedMotion = useReducedMotion();
+  const particleCount = variant === "hero" ? 15 : 8;
+  
+  if (prefersReducedMotion) {
+    return (
+      <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/15 via-blue-900/8 to-cyan-900/15" />
+      </div>
+    );
+  }
   
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
-      {/* Animated gradient background */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/10 to-cyan-900/20"
-        animate={{
-          background: [
-            "linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(30, 58, 138, 0.1), rgba(22, 78, 99, 0.2))",
-            "linear-gradient(135deg, rgba(30, 58, 138, 0.2), rgba(22, 78, 99, 0.1), rgba(147, 51, 234, 0.2))",
-            "linear-gradient(135deg, rgba(22, 78, 99, 0.2), rgba(147, 51, 234, 0.1), rgba(30, 58, 138, 0.2))",
-          ]
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-      />
+      {/* Static gradient background - removed expensive animation */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/15 via-blue-900/8 to-cyan-900/15" />
       
-      {/* Floating neon particles */}
+      {/* Optimized floating particles - Simplified animation */}
       {Array.from({ length: particleCount }).map((_, i) => {
-        const colors = ['#9333ea', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
-        const sizes = [2, 3, 4, 5, 6];
+        const colors = ['#9333ea', '#3b82f6', '#06b6d4'];
+        const size = 3;
         const color = colors[i % colors.length];
-        const size = sizes[i % sizes.length];
         
         return (
           <motion.div
@@ -57,80 +55,32 @@ const FuturisticBackground = ({ variant = "default", className = "" }) => {
               width: `${size}px`,
               height: `${size}px`,
               backgroundColor: color,
-              boxShadow: `0 0 ${size * 4}px ${color}`,
+              boxShadow: `0 0 ${size * 3}px ${color}`,
               left: `${(i * 7.3) % 100}%`,
               top: `${(i * 11.7) % 100}%`,
+              transform: 'translateZ(0)',
             }}
             animate={{
-              x: [0, 100, -50, 80, 0],
-              y: [0, -120, -80, -150, 0],
-              opacity: [0.2, 1, 0.3, 0.8, 0.2],
-              scale: [1, 1.5, 0.8, 2, 1],
+              y: [0, -100, 0],
+              opacity: [0.2, 0.6, 0.2],
             }}
             transition={{
-              duration: 15 + (i % 10),
+              duration: 12 + (i % 5),
               repeat: Infinity,
-              delay: i * 0.2,
-              ease: "easeInOut",
+              delay: i * 0.3,
+              ease: "linear",
             }}
           />
         );
       })}
       
-      {/* Glowing lines */}
-      {variant === "hero" && Array.from({ length: 8 }).map((_, i) => (
-        <motion.div
-          key={`line-${i}`}
-          className="absolute opacity-20"
-          style={{
-            width: '2px',
-            height: `${100 + i * 50}px`,
-            background: `linear-gradient(to bottom, transparent, #9333ea, transparent)`,
-            left: `${10 + i * 12}%`,
-            top: `${i * 15}%`,
-            transform: `rotate(${i * 45}deg)`,
-          }}
-          animate={{
-            opacity: [0.1, 0.6, 0.1],
-            scaleY: [1, 1.5, 1],
-          }}
-          transition={{
-            duration: 4 + i,
-            repeat: Infinity,
-            delay: i * 0.5,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-      
-      {/* Morphing shapes */}
-      {Array.from({ length: 6 }).map((_, i) => (
-        <motion.div
-          key={`morph-${i}`}
-          className="absolute opacity-10"
-          style={{
-            width: `${80 + i * 20}px`,
-            height: `${80 + i * 20}px`,
-            left: `${15 + i * 15}%`,
-            top: `${20 + i * 12}%`,
-            background: `linear-gradient(135deg, #9333ea, #3b82f6, #06b6d4)`,
-            filter: 'blur(40px)',
-          }}
-          animate={{
-            borderRadius: ['50%', '30% 70% 70% 30%', '60% 40% 40% 60%', '50%'],
-            scale: [1, 1.3, 0.7, 1],
-            rotate: [0, 180, 360],
-            x: [0, 30, -20, 0],
-            y: [0, -20, 10, 0],
-          }}
-          transition={{
-            duration: 20 + i * 3,
-            repeat: Infinity,
-            delay: i * 2,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
+      {/* Simplified static morphing shapes - No animation to reduce CPU load */}
+      {variant === "hero" && (
+        <>
+          <div className="absolute top-1/4 left-1/6 w-32 h-32 bg-gradient-to-br from-purple-500/8 to-blue-500/6 rounded-full blur-3xl" style={{ transform: 'translateZ(0)' }} />
+          <div className="absolute bottom-1/4 right-1/6 w-40 h-40 bg-gradient-to-tl from-cyan-500/8 to-purple-500/6 rounded-full blur-3xl" style={{ transform: 'translateZ(0)' }} />
+        </>
+      )}
     </div>
   );
 };
@@ -261,44 +211,24 @@ const MediaHeroSection = ({ setCurrentPage }) => (
     
     <div className="container mx-auto px-6 text-center relative z-10">
       <motion.div
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.2 }}
+        transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
         className="space-y-8"
       >
-        <motion.h1
-          className="text-6xl md:text-8xl lg:text-9xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent leading-tight"
-          animate={{
-            textShadow: [
-              '0 0 0 rgba(168, 85, 247, 0)',
-              '0 0 40px rgba(168, 85, 247, 0.8)',
-              '0 0 0 rgba(168, 85, 247, 0)',
-            ]
-          }}
-          transition={{ duration: 4, repeat: Infinity }}
-        >
+        <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent leading-tight">
           TechxServe
           <br />
-          <motion.span
-            className="block text-white/90"
-            animate={{
-              textShadow: [
-                '0 0 0 rgba(6, 182, 212, 0)',
-                '0 0 30px rgba(6, 182, 212, 0.6)',
-                '0 0 0 rgba(6, 182, 212, 0)',
-              ]
-            }}
-            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-          >
+          <span className="block text-white/90">
             Media
-          </motion.span>
-        </motion.h1>
+          </span>
+        </h1>
 
         <motion.p
           className="text-xl md:text-2xl text-white/70 max-w-4xl mx-auto leading-relaxed"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
         >
           The creative side of TechxServe – where stories, visuals, and ideas come alive through cutting-edge digital artistry and innovation.
         </motion.p>
@@ -392,35 +322,19 @@ const MediaAboutSection = () => (
     
     <div className="container mx-auto px-6 relative z-10">
       <div className="grid lg:grid-cols-2 gap-16 items-center">
-        {/* Content */}
+        {/* Content - Optimized */}
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-50px" }}
           className="space-y-8"
         >
-          <motion.h2
-            className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent"
-            animate={{
-              textShadow: [
-                '0 0 0 rgba(168, 85, 247, 0)',
-                '0 0 20px rgba(168, 85, 247, 0.6)',
-                '0 0 0 rgba(168, 85, 247, 0)',
-              ]
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
+          <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
             Who We Are
-          </motion.h2>
+          </h2>
           
-          <motion.div
-            className="w-24 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-          />
+          <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full" />
 
           <motion.p
             className="text-lg text-white/80 leading-relaxed"
@@ -872,56 +786,29 @@ const MediaContactSection = () => {
     <section id="contact" className="py-24 bg-black relative overflow-hidden">
       <FuturisticBackground />
       
-      {/* Animated waves background */}
-      <motion.div
-        className="absolute inset-0 opacity-20"
-        animate={{
-          background: [
-            'radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 50%)',
-            'radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%)',
-            'radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.3) 0%, transparent 50%)',
-            'radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 50%)',
-          ]
-        }}
-        transition={{ duration: 8, repeat: Infinity }}
-      />
+      {/* Static background - Removed expensive animation */}
+      <div className="absolute inset-0 opacity-15 bg-gradient-to-br from-purple-900/30 via-transparent to-cyan-900/30" />
       
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Contact info */}
+          {/* Contact info - Optimized */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-50px" }}
             className="space-y-8"
           >
-            <motion.h2
-              className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent"
-              animate={{
-                textShadow: [
-                  '0 0 0 rgba(168, 85, 247, 0)',
-                  '0 0 25px rgba(168, 85, 247, 0.8)',
-                  '0 0 0 rgba(168, 85, 247, 0)',
-                ]
-              }}
-              transition={{ duration: 4, repeat: Infinity }}
-            >
+            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
               Let's Create
               <br />
               Something Amazing
-            </motion.h2>
+            </h2>
             
-            <motion.p
-              className="text-lg text-white/80 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
+            <p className="text-lg text-white/80 leading-relaxed">
               Ready to bring your vision to life? Our creative team is here to transform 
               your ideas into stunning visual experiences that captivate and inspire.
-            </motion.p>
+            </p>
 
             {/* Contact details */}
             <motion.div
